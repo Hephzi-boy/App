@@ -1,29 +1,48 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+// app/_layout.tsx or app/layout.tsx
+import { Session } from '@supabase/supabase-js';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
+import Account from '../components/Account';
+import Auth from '../components/Auth';
+import CustomsToast from '../components/CustomsToast';
+import { supabase } from '../lib/supabase';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import '../app/globals.css';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [session, setSession] = useState<Session | null>(null);
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe(); // cleanup listener
+    };
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <View style={{ flex: 1 }}>
+      {session && session.user ? (
+        <Account key={session.user.id} session={session} />
+      ) : (
+        <Auth />
+      )}
+      <Stack screenOptions={{ headerShown: false }} />
+      <Toast 
+        config={{
+          custom: (props) => (
+            <CustomsToast {...props} />
+          ),
+        }}
+      />
+    </View>
   );
 }
