@@ -1,8 +1,7 @@
-import { Tabs } from 'expo-router'
-import { Image, useColorScheme, View } from 'react-native'
+import { Tabs } from 'expo-router';
+import { Image, useColorScheme, View } from 'react-native';
 
-// Import your home.png image
-import home from './assets/home.png'; // Adjust the path if needed
+import house from '@/assets/images/house.png'; // Adjust the path as necessary
 
 export default function TabLayout() {
   const colorScheme = useColorScheme()
@@ -18,11 +17,10 @@ export default function TabLayout() {
         tabBarIcon: ({ focused }) => (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Image
-              source={home}
+              source={house}
               style={{
-                width: 28,
-                height: 28,
-                tintColor: focused ? '#60a5fa' : '#fff', // light blue when focused, white otherwise
+                width: 65,
+                height: 50,
               }}
               resizeMode="contain"
             />
@@ -34,6 +32,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerShown: false,
         }}
       />
     </Tabs>

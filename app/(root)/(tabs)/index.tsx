@@ -1,4 +1,3 @@
-// HomeScreen.tsx
 import Images from '@/constants/Images';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
 
@@ -21,7 +21,7 @@ type Product = {
   image: string;
 };
 
-export default function HomeScreen() {
+export default function ProductUploader() {
   const [products, setProducts] = useState<Product[]>([]);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -40,12 +40,22 @@ export default function HomeScreen() {
 
   const handleAddProduct = () => {
     if (!name || !price || !image) {
-      alert('Please fill all fields and upload an image.');
+      Toast.show({
+        type: 'custom',
+        text1: 'Missing Fields',
+        text2: 'Please fill all fields and upload an image.',
+        props: { icon: Images.cancel },
+      });
       return;
     }
 
     if (products.length >= 5) {
-      alert('You have reached the product limit (5).');
+      Toast.show({
+        type: 'custom',
+        text1: 'Cannot Upload',
+        text2: 'You cannot upload any more products.',
+        props: { icon: Images.cancel },
+      });
       return;
     }
 
@@ -70,24 +80,30 @@ export default function HomeScreen() {
       text2: 'You have successfully uploaded a product.',
       props: { icon: Images.done },
     });
-    Toast.show({
-      type: 'custom',
-      text1: 'Upload Limit Reached',
-      text2: 'You have uploaded the maximum number of products',
-      props: { icon: Images.done },
-    });
 
+    if (products.length + 1 >= 5) {
+      Toast.show({
+        type: 'custom',
+        text1: 'Upload Limit Reached',
+        text2: 'You have uploaded the maximum number of products.',
+        props: { icon: Images.done },
+      });
+    }
+  };
+
+  // Remove product by id
+  const handleRemoveProduct = (id: string) => {
+    setProducts(products.filter(product => product.id !== id));
     Toast.show({
       type: 'custom',
-      text1: 'Cannot Upload',
-      text2: 'You cannot upload any more products.',
+      text1: 'Product Removed',
+      text2: 'The product has been removed.',
       props: { icon: Images.cancel },
     });
-
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>Product Uploader</Text>
 
       <FlatList
@@ -99,10 +115,16 @@ export default function HomeScreen() {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Image source={{ uri: item.image }} style={styles.image} />
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.price}>₦{item.price}</Text>
             </View>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveProduct(item.id)}
+            >
+              <Text style={styles.removeButtonText}>Remove</Text>
+            </TouchableOpacity>
           </View>
         )}
         style={styles.list}
@@ -141,14 +163,14 @@ export default function HomeScreen() {
       {products.length >= 5 && (
         <Text style={styles.limitText}>You’ve reached the max (5) product limit.</Text>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F0FFFF',
     flex: 1,
   },
   heading: {
@@ -207,9 +229,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
+    backgroundColor: '#e6e6e6',
   },
   addButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#8FBC8F',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
@@ -217,12 +240,23 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 20,
   },
   limitText: {
     textAlign: 'center',
     color: 'red',
     fontWeight: '600',
     marginTop: 16,
+  },
+  removeButton: {
+    backgroundColor: '#ff4d4f',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    marginLeft: 10,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

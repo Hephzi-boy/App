@@ -6,7 +6,7 @@ export default function CustomToast({ text1, text2, props }: any) {
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#fff',
+      backgroundColor: '#48D1CC',
       borderRadius: 10,
       padding: 12,
       shadowColor: '#000',
