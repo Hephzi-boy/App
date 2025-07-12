@@ -23,6 +23,9 @@ This is a simple React Native (Expo) app that allows users to upload up to 5 pro
 - React Native Toast
 - Supabase (auth only, optional)
 
+
+## Video of the Application 
+https://drive.google.com/file/d/1U2FfBn9CNDjxAJY42ScBxjw85hblAMtg/view?usp=sharing
 ---
 
 ## 🚀 How to Run Locally
